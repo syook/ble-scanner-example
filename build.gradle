@@ -1,5 +1,19 @@
 apply plugin: 'com.android.application'
 
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/syook/maven"
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.6.2'
+    }
+}
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -26,10 +40,13 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.syook:ble-scanner-sdk:0.1.0'
-   //implementation project(path: ':syook')
 }
-/*repositories {
+
+repositories {
+    google()
+    mavenCentral()
+    jcenter()
     maven {
-        url  "https://dl.bintray.com/syook/maven"
+        url "https://dl.bintray.com/syook/maven"
     }
-}*/
+}
