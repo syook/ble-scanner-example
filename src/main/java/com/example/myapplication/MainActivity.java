@@ -2,9 +2,16 @@ package com.example.myapplication;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.*;
+
+//import androidx.appcompat.app.AppCompatActivity;
+//import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,16 +21,27 @@ import com.syook.BLEScanner;
 
 import org.json.JSONObject;
 
+
+
 public class MainActivity extends AppCompatActivity {
 
     BLEScanner myBLEScanner;
     Button startScanningButton,stopScanningButton;
     TextView peripheralTextView;
+    int switchgps = 0;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.e("App status : ", "Destroyed");
         myBLEScanner.stopScan();
+        //unregisterReceiver(m_timeChangedReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     @Override
@@ -31,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        peripheralTextView = (TextView)findViewById(R.id.PeripheralTextView);
+         peripheralTextView = (TextView)findViewById(R.id.PeripheralTextView);
+
+
+        // start service, it has to be foreground service.
+        Intent serviceIntent = new Intent(this, BLEScannerService.class);
+        serviceIntent.putExtra("inputExtra", "Tab to open App");
+        ContextCompat.startForegroundService(this, serviceIntent);
+
 
         // BLEScanner object
         myBLEScanner = new BLEScanner(this);
@@ -40,18 +65,25 @@ public class MainActivity extends AppCompatActivity {
             // here we get BLE Scanned Data
             @Override
             public void onScanResults(JSONObject data) {
-                Log.e("data" , data.toString());
+                Log.e("data from activity : " , data.toString());
                 peripheralTextView.append(data.toString()+ "\n");
                 // auto scroll for text view
                 final int scrollAmount = peripheralTextView.getLayout().getLineTop(peripheralTextView.getLineCount()) - peripheralTextView.getHeight();
                 if (scrollAmount > 0)
                     peripheralTextView.scrollTo(0, scrollAmount);
+
+
             }
 
             // here we get error messages from library
             @Override
             public void onError(String error) {
-                Log.e("Error : ",error);
+                Log.e("Error from activity: ",error);
+            }
+
+            @Override
+            public void onScanStatusChange(Boolean status) {
+                Log.e("Status from activity : ",status.toString());
             }
         });
 
@@ -107,5 +139,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
 }
